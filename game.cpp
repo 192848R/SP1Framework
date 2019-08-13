@@ -270,6 +270,3 @@ void renderToScreen()
     // Writes the buffer to the console, hence you will see what you have written
     g_Console.flushBufferToConsole();
 }
-
-jnhbgvfdcerfc
-fecer
