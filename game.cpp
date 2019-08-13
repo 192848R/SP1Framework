@@ -149,25 +149,25 @@ void moveCharacter()
 
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0)
+    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 3)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y--;
         bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0)
+    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 2)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X--;
         bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 2)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.Y++;
         bSomethingHappened = true;
     }
-    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
+    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 3)
     {
         //Beep(1440, 30);
         g_sChar.m_cLocation.X++;
@@ -220,19 +220,43 @@ void renderGame()
 
 void renderMap()
 {
-    // Set up sample colours, and output shadings
-    const WORD colors[] = {
-        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-    };
+    //white
+    WORD color = 0xfff;
 
     COORD c;
-    for (int i = 0; i < 12; ++i)
+
+	//border of the map
+    for (int i = 0; i < g_Console.getConsoleSize().X; ++i)
     {
-        c.X = 5 * i;
-        c.Y = i + 1;
-        colour(colors[i]);
-        g_Console.writeToBuffer(c, " °±²Û", colors[i]);
+        colour(color);
+        c.X = i;
+
+		for (int j = 2; j < g_Console.getConsoleSize().Y; ++j)
+		{
+			c.Y = j;
+
+			//vertical line
+			if (c.X == 0)
+			{
+				g_Console.writeToBuffer(c, "  ", color);
+			}
+
+			if (c.X == g_Console.getConsoleSize().X-2)
+			{
+				g_Console.writeToBuffer(c, "  ", color);
+			}
+			
+			//horizontal line
+			if (c.Y == 2)
+			{
+				g_Console.writeToBuffer(c, " ", color);
+			}
+
+			if (c.Y == g_Console.getConsoleSize().Y-1)
+			{
+				g_Console.writeToBuffer(c, " ", color);
+			}
+		}
     }
 }
 
