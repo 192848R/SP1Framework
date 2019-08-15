@@ -15,6 +15,8 @@ bool    g_abKeyPressed[K_COUNT];
 SGameChar   g_sChar;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
+char lvl1[25][80];
+char lvl2[25][80];
 
 // Console object
 Console g_Console(80, 25, "SP1 Framework");
@@ -35,8 +37,8 @@ void init( void )
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
 
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
+    g_sChar.m_cLocation.X = 2;
+    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y - 2;
     g_sChar.m_bActive = true;
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -146,32 +148,62 @@ void moveCharacter()
     bool bSomethingHappened = false;
     if (g_dBounceTime > g_dElapsedTime)
         return;
-
+	
+	renderMap();
+	
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
     if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 3)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.Y--;
-        bSomethingHappened = true;
+        if (lvl2[g_sChar.m_cLocation.Y - 1][g_sChar.m_cLocation.X] == (char)178)
+		{
+			g_sChar.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		}
+		else
+		{
+			g_sChar.m_cLocation.Y--;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 2)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X--;
-        bSomethingHappened = true;
+       //Beep(1440, 30);
+		if (lvl2[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X - 1] == (char)178)
+		{
+			g_sChar.m_cLocation.X = g_sChar.m_cLocation.X;
+		}
+		else
+		{
+			g_sChar.m_cLocation.X--;
+		    bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 2)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.Y++;
-        bSomethingHappened = true;
+		if (lvl2[g_sChar.m_cLocation.Y + 1][g_sChar.m_cLocation.X] == (char)178)
+		{
+			g_sChar.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		}
+		else
+		{
+			g_sChar.m_cLocation.Y++;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 3)
     {
         //Beep(1440, 30);
-        g_sChar.m_cLocation.X++;
-        bSomethingHappened = true;
+		if (lvl2[g_sChar.m_cLocation.Y][g_sChar.m_cLocation.X + 1] == (char)178)
+		{
+			g_sChar.m_cLocation.X = g_sChar.m_cLocation.X;;
+		}
+		else
+		{
+			g_sChar.m_cLocation.X++;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_SPACE])
     {
@@ -220,44 +252,42 @@ void renderGame()
 
 void renderMap()
 {
-    //white
-    WORD color = 0xfff;
 
     COORD c;
 
-	//border of the map
-    for (int i = 0; i < g_Console.getConsoleSize().X; ++i)
-    {
-        colour(color);
-        c.X = i;
-
-		for (int j = 2; j < g_Console.getConsoleSize().Y; ++j)
+	ifstream nxtfile;
+	nxtfile.open("lvl2.txt");
+	
+	if (nxtfile.is_open())
+	{
+		for (int i = 0; i < 25; ++i)
 		{
-			c.Y = j;
+			c.Y = i;
+			for (int j = 0; j < 80; ++j)
+			{
+				c.X = j;
+				nxtfile >> lvl2[i][j];
 
-			//vertical line
-			if (c.X == 0)
-			{
-				g_Console.writeToBuffer(c, "  ", color);
-			}
+				if (lvl2[i][j] == 'X')
+				{
+					lvl2[i][j] = (char)178;
+				}
 
-			if (c.X == g_Console.getConsoleSize().X-2)
-			{
-				g_Console.writeToBuffer(c, "  ", color);
-			}
-			
-			//horizontal line
-			if (c.Y == 2)
-			{
-				g_Console.writeToBuffer(c, " ", color);
-			}
+				if (lvl2[i][j] == '.')
+				{
+					lvl2[i][j] = (char)176;
+				}
 
-			if (c.Y == g_Console.getConsoleSize().Y-1)
-			{
-				g_Console.writeToBuffer(c, " ", color);
+				if (lvl2[i][j] == 'S')
+				{
+					lvl2[i][j] = ' ';
+				}
+				g_Console.writeToBuffer(c, lvl2[i][j]);
+
 			}
 		}
-    }
+		nxtfile.close();
+	}
 }
 
 void renderCharacter()
